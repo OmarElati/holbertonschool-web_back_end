@@ -7,10 +7,10 @@ import time
 import asyncio
 
 
-wait_n = __import__('1-concurrent_coroutines')
+wait_n = __import__('1-concurrent_coroutines').wait_n
 
 
-async def measure_time(n: int, max_delay: int) -> float:
+def measure_time(n: int, max_delay: int) -> float:
     """
     param n: The number of times to call wait_n.
     param max_delay: The maximum delay in seconds for wait_random.
