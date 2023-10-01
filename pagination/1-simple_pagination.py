@@ -1,11 +1,18 @@
 #!/usr/bin/env python3
+"""
+Implement a method named get_page that
+takes two integer arguments page with 
+value 1 and page_size with default value 10."""
 import csv
 from typing import List, Tuple
 
-def index_range(page: int, page_size: int) -> Tuple[int, int]:
+
+def index_range(page: int, page_size: int) \
+    -> Tuple[int, int]:
     end: int = page * page_size
     start: int = end - page_size
     return (start, end)
+
 
 class Server:
     DATA_FILE = "Popular_Baby_Names.csv"
