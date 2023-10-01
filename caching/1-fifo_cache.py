@@ -17,7 +17,6 @@ class FIFOCache(BaseCaching):
         """ Add an item to the cache """
         if key is not None and item is not None:
             if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                # Get the first item that was added (FIFO)
                 first_key = next(iter(self.cache_data))
                 print(f"DISCARD: {first_key}")
                 self.cache_data.pop(first_key)
