@@ -14,7 +14,8 @@ async def task_wait_n(n: int, max_delay: int) -> List[float]:
     """
     param n: The number of times to call task_wait_random.
     param max_delay: The maximum delay in seconds for task_wait_random.
-    return: A list of floats representing the results of task_wait_random calls.
+    return: A list of floats representing the results
+            of task_wait_random calls.
     """
     tasks = []
     for i in range(n):
