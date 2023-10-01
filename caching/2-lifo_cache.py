@@ -1,26 +1,25 @@
 #!/usr/bin/python3
 """
-class FIFOCache that inherits from
+class LIFOCache that inherits from
 BaseCaching and is a caching system
 """
 BaseCaching = __import__('base_caching').BaseCaching
 
 
-class FIFOCache(BaseCaching):
-    """ FIFOCache class """
+class LIFOCache(BaseCaching):
+    """ LIFOCache class """
 
     def __init__(self):
-        """ Initialize FIFOCache """
+        """ Initialize LIFOCache """
         super().__init__()
 
     def put(self, key, item):
         """ Add an item to the cache """
         if key is not None and item is not None:
             if len(self.cache_data) >= BaseCaching.MAX_ITEMS:
-                # Get the first item that was added (FIFO)
-                first_key = next(iter(self.cache_data))
-                print(f"DISCARD: {first_key}")
-                self.cache_data.pop(first_key)
+                last_key = list(self.cache_data.keys())[-1]
+                print(f"DISCARD: {last_key}")
+                self.cache_data.pop(last_key)
             self.cache_data[key] = item
 
     def get(self, key):
