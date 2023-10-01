@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import math
 """
-Returns the floor of a floating-point number.
+This module defines a function for calculating the floor of a floating-point number.
 """
 
 
