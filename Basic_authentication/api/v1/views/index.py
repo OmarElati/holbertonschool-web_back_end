@@ -40,4 +40,3 @@ def forbidden() -> str:
     forbidden request
     """
     abort(403)
-  
