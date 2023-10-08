@@ -84,3 +84,29 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
     )
 
     return db
+
+
+def main():
+    db = get_db()
+    
+    if db:
+        cursor = db.cursor()
+        cursor.execute("SELECT * FROM users;")
+        
+        logger = get_logger()
+        
+        for row in cursor:
+            filtered_data = filter_datum(
+                PII_FIELDS,
+                RedactingFormatter.REDACTION,
+                "; ".join(map(lambda x: "{}={}".format(x[0], x[1]), zip(PII_FIELDS, row))),
+                RedactingFormatter.SEPARATOR
+            )
+            logger.info(filtered_data)
+
+        cursor.close()
+        db.close()
+
+
+if __name__ == "__main__":
+    main()
