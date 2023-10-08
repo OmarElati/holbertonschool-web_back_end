@@ -5,6 +5,8 @@ Personal data
 import re
 from typing import List
 import logging
+import os
+import mysql.connector
 
 
 def filter_datum(fields: List[str], redaction: str, message: str,
@@ -63,3 +65,20 @@ def get_logger() -> logging.Logger:
     logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db() -> mysql.connector.connection.MySQLConnection:
+    """ Get database credentials from environment variables with default values """
+    user = os.getenv("PERSONAL_DATA_DB_USERNAME", 'root')
+    password = os.getenv("PERSONAL_DATA_DB_PASSWORD", '')
+    host = os.getenv("PERSONAL_DATA_DB_HOST", 'localhost')
+    db_name = os.getenv("PERSONAL_DATA_DB_NAME")
+
+    db = mysql.connector.connect(
+        host=host,
+        database=db_name,
+        user=user,
+        password=password
+    )
+
+    return db
