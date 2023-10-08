@@ -32,3 +32,12 @@ def unauthorized() -> str:
     unauthorize request
     """
     abort(401)
+
+
+@app_views.route("/forbidden", methods=['GET'], strict_slashes=False)
+def forbidden() -> str:
+    """
+    forbidden request
+    """
+    abort(403)
+  
