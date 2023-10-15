@@ -10,7 +10,7 @@ from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
 from uuid import uuid4
-
+import uuid
 
 def _hash_password(password: str) -> str:
     """ Takes in string arg, converts to unicode
@@ -44,10 +44,19 @@ class Auth:
     def valid_login(self, email: str, password: str) -> bool:
         """ Checks if user pswd is valid, locating by email """
         try:
-            found_user = self._db.find_user_by(email=email)
-            return checkpw(
-                password.encode('utf-8'),
-                found_user.hashed_password
-                )
-        except NoResultFound:
-            return False
+            user = self._db.find_user_by(email=email)
+            if user:
+                hashed_password = user.hashed_password
+                password = password.encode('utf-8')
+                return bcrypt.checkpw(password, hashed_password)
+        except ValueError:
+            pass
+        return False
+
+    def create_session(self, email: str) -> str:
+        user = self._db.find_user_by(email=email)
+        if user:
+            session_id = str(uuid.uuid4())
+            user.session_id = session_id
+            return session_id
+        return None
