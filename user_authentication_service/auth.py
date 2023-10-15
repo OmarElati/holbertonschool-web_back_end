@@ -5,17 +5,25 @@ Find user by session ID, Destroy session, Generate reset password token,
 Update password
 """
 import bcrypt
-from bcrypt import checkpw
+from bcrypt import hashpw, gensalt, checkpw
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
+from uuid import uuid4
 
 
-def _hash_password(password: str) -> bytes:
-    """Hash a password using bcrypt with a random salt."""
-    salt = bcrypt.gensalt()
-    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
-    return hashed_password
+def _hash_password(password: str) -> str:
+    """ Takes in string arg, converts to unicode
+    Returns salted, hashed pswd as bytestring
+    """
+    return hashpw(password.encode('utf-8'), gensalt())
+
+
+def _generate_uuid() -> str:
+    """ Generates UUID
+    Returns string representation of new UUID
+    """
+    return str(uuid4())
 
 
 class Auth:
@@ -26,16 +34,12 @@ class Auth:
         self._db = DB()
 
     def register_user(self, email: str, password: str) -> User:
+        """ Registers and returns a new user if email isn't listed """
         try:
-            existing_user = self._db.find_user_by(email=email)
-            if existing_user:
-                raise ValueError(f"User {email} already exists")
+            self._db.find_user_by(email=email)
+            raise ValueError(f"User {email} already exists")
         except NoResultFound:
-            pass
-
-        hashed_password = _hash_password(password)
-        new_user = self._db.add_user(email, hashed_password)
-        return new_user
+            return self._db.add_user(email, _hash_password(password))
 
     def valid_login(self, email: str, password: str) -> bool:
         """ Checks if user pswd is valid, locating by email """
