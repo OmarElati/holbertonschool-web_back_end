@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
-"""
-Main file
-"""
-from auth import _hash_password
+import bcrypt
 
-print(_hash_password("Hello Holberton"))
+def _hash_password(password: str) -> bytes:
+    """Hash a password using bcrypt with a random salt."""
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password.encode('utf-8'), salt)
+    return hashed_password
