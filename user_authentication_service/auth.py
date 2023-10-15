@@ -5,6 +5,7 @@ Find user by session ID, Destroy session, Generate reset password token,
 Update password
 """
 import bcrypt
+from bcrypt import checkpw
 from db import DB
 from user import User
 from sqlalchemy.orm.exc import NoResultFound
@@ -37,12 +38,12 @@ class Auth:
         return new_user
 
     def valid_login(self, email: str, password: str) -> bool:
+        """ Checks if user pswd is valid, locating by email """
         try:
-            user = self._db.find_user_by(email=email)
-            if user:
-                hashed_password = user.hashed_password
-                password = password.encode('utf-8')
-                return bcrypt.checkpw(password, hashed_password)
-        except ValueError:
-            pass
-        return False
+            found_user = self._db.find_user_by(email=email)
+            return checkpw(
+                password.encode('utf-8'),
+                found_user.hashed_password
+                )
+        except NoResultFound:
+            return False
