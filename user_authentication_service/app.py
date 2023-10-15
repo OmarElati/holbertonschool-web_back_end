@@ -23,8 +23,9 @@ def index() -> str:
 def users() -> str:
     """
         POST /users
-        Registers new user with email and pswd in x-www-form-urlencoded request,
-        or finds if user already registered based on email
+        Registers new user with email and pswd in
+        x-www-form-urlencoded request, or finds
+        if user already registered based on email
         Return:
         - JSON payload
     """
@@ -86,7 +87,7 @@ def login() -> str:
 
 @app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def logout() -> None:
-    """ 
+    """
         DELETE /sessions
         Destroys session by finding session_id (key in cookie)
         Return:
@@ -156,7 +157,8 @@ def update_password() -> str:
     """
         PUT /reset_password
         Updates user password
-        Email, reset_token and new_password fields in x-www-form-urlencoded request
+        Email, reset_token and new_password
+        fields in x-www-form-urlencoded request
         Return:
         - JSON payload
     """
