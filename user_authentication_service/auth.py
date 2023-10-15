@@ -12,6 +12,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from uuid import uuid4
 import uuid
 
+
 def _hash_password(password: str) -> str:
     """ Takes in string arg, converts to unicode
     Returns salted, hashed pswd as bytestring
