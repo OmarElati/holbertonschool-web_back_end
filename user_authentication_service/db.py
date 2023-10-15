@@ -1,75 +1,88 @@
 #!/usr/bin/env python3
-"""DB module
+""" Model for DB
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.orm.session import Session
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.exc import InvalidRequestError
+
 from user import Base, User
 
 
 class DB:
-    """DB class
-    """
+    """ DB class """
 
-    def __init__(self) -> None:
-        """Initialize a new DB instance
-        """
-        self._engine = create_engine("sqlite:///a.db", echo=True)
+    def __init__(self):
+        """ Instance """
+
+        self._engine = create_engine("sqlite:///a.db", echo=False)
         Base.metadata.drop_all(self._engine)
         Base.metadata.create_all(self._engine)
         self.__session = None
 
     @property
-    def _session(self) -> Session:
-        """Memoized session object
-        """
+    def _session(self):
+        """ Sets up session """
+
         if self.__session is None:
             DBSession = sessionmaker(bind=self._engine)
             self.__session = DBSession()
         return self.__session
 
     def add_user(self, email: str, hashed_password: str) -> User:
-        """
-        Add a new user to the database and return the User object
-        """
+        """ Adds user to db """
+
         new_user = User(email=email, hashed_password=hashed_password)
         self._session.add(new_user)
         self._session.commit()
         return new_user
 
     def find_user_by(self, **kwargs) -> User:
-        """
-        takes in arbitrary keyword arguments and returns the first row
-        found in the users table as filtered by the method’s input
-        arguments
-        """
-        if kwargs is None:
+        """ Returns first row found in users table based on keyword args """
+
+        """ Handle invalid requests """
+        if not kwargs:
             raise InvalidRequestError
-        user = self._session.query(User).filter_by(**kwargs).first()
-        if user is None:
+
+        users_columns = [
+            'id',
+            'email',
+            'hashed_password',
+            'session_id',
+            'reset_token'
+            ]
+
+        for arg in kwargs:
+            if arg not in users_columns:
+                raise InvalidRequestError
+
+        """ Search table for user """
+
+        search_user = self._session.query(User).filter_by(**kwargs).first()
+
+        if search_user:
+            return search_user
+        else:
             raise NoResultFound
-        return user
 
-    def update_user(self, user_id, **kwargs):
-        """
-        locate the user to update, then will update the user’s attributes
-        as passed in the method’s arguments then commit changes to the
-        database
-        """
-        try:
-            user = self.find_user_by(id=user_id)
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """ Finds user record and updates attributes """
 
-            for key, value in kwargs.items():
-                if hasattr(user, key):
-                    setattr(user, key, value)
-                else:
-                    raise ValueError(f"Invalid attribute: {key}")
+        user_to_update = self.find_user_by(id=user_id)
 
-            self._session.commit()
-        except NoResultFound:
-            raise NoResultFound(f"No user found with user_id: {user_id}")
-        except InvalidRequestError as e:
-            raise e
+        users_columns = [
+            'id',
+            'email',
+            'hashed_password',
+            'session_id',
+            'reset_token'
+            ]
+
+        for k, v in kwargs.items():
+            if k in users_columns:
+                setattr(user_to_update, k, v)
+            else:
+                raise ValueError
+
+        self._session.commit()

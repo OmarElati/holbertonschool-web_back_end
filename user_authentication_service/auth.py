@@ -15,24 +15,28 @@ from typing import Union
 
 
 def _hash_password(password: str) -> str:
-    """ Takes in string arg, converts to unicode
+    """
+    Takes in string arg, converts to unicode
     Returns salted, hashed pswd as bytestring
     """
     return hashpw(password.encode('utf-8'), gensalt())
 
 
 def _generate_uuid() -> str:
-    """ Generates UUID
+    """
+    Generates UUID
     Returns string representation of new UUID
     """
     return str(uuid4())
 
 
 class Auth:
-    """Auth class to interact with the authentication database.
+    """
+    Auth class to interact with the authentication database.
     """
 
     def __init__(self):
+        """ Instance """
         self._db = DB()
 
     def register_user(self, email: str, password: str) -> User:
@@ -77,7 +81,33 @@ class Auth:
 
     def destroy_session(self, user_id: str) -> None:
         """ Updates user's session_id to None """
+        if user_id is None:
+            return None
         try:
-            self._db.update_user(user_id, session_id=None)
+            found_user = self._db.find_user_by(id=user_id)
+            self._db.update_user(found_user.id, session_id=None)
         except NoResultFound:
             return None
+
+    def get_reset_password_token(self, email: str) -> str:
+        """ Finds user by email, updates user's reset_token with UUID """
+        try:
+            found_user = self._db.find_user_by(email=email)
+        except NoResultFound:
+            raise ValueError
+
+        reset_token = _generate_uuid()
+        self._db.update_user(found_user.id, reset_token=reset_token)
+        return reset_token
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """ Finds user by reset_token, updates user's pswd """
+        try:
+            found_user = self._db.find_user_by(reset_token=reset_token)
+        except NoResultFound:
+            raise ValueError
+        new_pswd = _hash_password(password)
+        self._db.update_user(
+            found_user.id,
+            hashed_password=new_pswd,
+            reset_token=None)
