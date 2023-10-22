@@ -6,14 +6,14 @@
 </head>
 
 <body>
-    <header>
-        <h1>{{ gettext('home_header') }}</h1>
+    <h1>Welcome to the App</h1>
+    <p>
         {% if g.user %}
-        <p>{{ gettext('logged_in_as', username=g.user.name) }}</p>
+            {{ _("Hello, %(name)s!", name=g.user['name']) }}
         {% else %}
-        <p>{{ gettext('not_logged_in') }}</p>
+            {{ _("You are not logged in.") }}
         {% endif %}
-    </header>
+    </p>
 </body>
 
 </html>
