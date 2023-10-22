@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-flask app
+implement a way to force a particular locale.
 """
 from flask import Flask, request, render_template
 from flask_babel import Babel, gettext
@@ -10,9 +10,7 @@ babel = Babel(app)
 
 
 class Config(object):
-    """
-    config translate
-    """
+    """ Class will configure available languages in the app """
     LANGUAGES = ["en", "fr"]
     BABEL_DEFAULT_LOCALE = "en"
     BABEL_DEFAULT_TIMEZONE = "UTC"
@@ -24,9 +22,7 @@ app.config.from_object(Config)
 
 @babel.localeselector
 def get_locale():
-    """
-    get local lang
-    """
+    """ Getting locale from request.accept_languages """
     local_lang = request.args.get("locale")
     supp_lang = app.config["LANGUAGES"]
     if local_lang in supp_lang:
@@ -37,7 +33,5 @@ def get_locale():
 
 @app.route("/")
 def hello_world():
-    """
-    hello world
-    """
+    """ Returning our html page """
     return render_template("4-index.html")
