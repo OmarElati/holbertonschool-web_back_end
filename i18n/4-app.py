@@ -30,6 +30,7 @@ def get_locale():
     else:
         return request.accept_languages.best_match(app.config["LANGUAGES"])
 
+
 @app.route("/")
 def hello_world():
     """Returning our HTML page"""
