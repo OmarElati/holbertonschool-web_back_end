@@ -1,19 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
-    <title>{{ gettext('home_title') }}</title>
+    <title>Login System Mockup</title>
 </head>
-
 <body>
-    <header>
-        <h1>{{ gettext('home_header') }}</h1>
-        {% if g.user %}
-        <p>{{ gettext('logged_in_as', username=g.user.name) }}</p>
-        {% else %}
-        <p>{{ gettext('not_logged_in') }}</p>
-        {% endif %}
-    </header>
+    <div>
+        <p>
+            {% if g.user %}
+                {% if g.user['locale'] == "fr" %}
+                    Vous êtes connecté en tant que {{ g.user['name'] }}.
+                {% else %}
+                    You are logged in as {{ g.user['name'] }}.
+                {% endif %}
+            {% else %}
+                {% if g.user and g.user['locale'] == "fr" %}
+                    Vous n'êtes pas connecté.
+                {% else %}
+                    You are not logged in.
+                {% endif %}
+            {% endif %}
+        </p>
+    </div>
 </body>
-
 </html>

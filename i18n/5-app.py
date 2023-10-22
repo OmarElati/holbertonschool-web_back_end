@@ -35,7 +35,6 @@ def index():
     return render_template('5-index.html')
 
 
-@babel.localeselector
 def get_locale():
     """ Getting locale from request.accept_languages """
     locale = request.args.get("locale")
