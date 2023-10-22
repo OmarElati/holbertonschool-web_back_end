@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2023-10-22 13:06+0200\n"
-"PO-Revision-Date: 2023-10-22 21:35+0200\n"
+"PO-Revision-Date: 2023-10-22 21:51+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: fr\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -35,3 +35,4 @@ msgstr ""
 #: templates/7-index.html:11 templates/index.html:11
 msgid "not_logged_in"
 msgstr ""
+
