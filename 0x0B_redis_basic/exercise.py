@@ -37,7 +37,7 @@ def call_history(method: Callable) -> Callable:
     return wrapper
 
 
-def replay(cache, func):
+def replay(fn: Callable) -> str:
     """
     Display the history of calls of a particular function.
 
