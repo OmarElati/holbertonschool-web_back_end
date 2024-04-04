@@ -48,13 +48,15 @@ class Cache:
         self._redis.set(key, data)
         return key
 
-    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float, None]:
+    def get(self, key: str, fn: Callable = None
+            ) -> Union[str, bytes, int, float, None]:
         """
         Retrieve data from Redis based on the given key.
 
         Args:
             key (str): The key associated with the data to be retrieved.
-            fn (Callable, optional): A callable function used to convert the retrieved data.
+            fn (Callable, optional): A callable function used to convert
+                the retrieved data.
                 Defaults to None.
 
         Returns:
@@ -84,7 +86,8 @@ class Cache:
         Retrieve integer data from Redis based on the given key.
 
         Args:
-            key (str): The key associated with the integer data to be retrieved.
+            key (str): The key associated with
+                the integer data to be retrieved.
 
         Returns:
             Union[int, None]: The retrieved integer data.
