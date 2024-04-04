@@ -42,13 +42,15 @@ def replay(cache, func):
     Display the history of calls of a particular function.
 
     Args:
+        cache (Cache): The Cache instance.
         func (Callable): The function to replay the history for.
     """
     func_name = func.__qualname__
     inputs = cache._redis.lrange(f"{func_name}:inputs", 0, -1)
     outputs = cache._redis.lrange(f"{func_name}:outputs", 0, -1)
 
-    print(f"{func_name} was called {len(inputs)} times:")
+    value_key = cache._redis.get(func_name).decode('utf-8')
+    print(f"{func_name} was called {value_key} times:")
     for input_args, output in zip(inputs, outputs):
         print(f"{func_name}{input_args.decode()} -> {output.decode()}")
 
