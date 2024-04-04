@@ -13,6 +13,16 @@ from typing import Union, Callable
 from functools import wraps
 
 
+def count_calls(method: Callable) -> Callable:
+        """Decorator to count the number of calls to a method."""
+        @wraps(method)
+        def wrapper(self, *args, **kwargs):
+            key = method.__qualname__
+            self._redis.incr(key)
+            return method(self, *args, **kwargs)
+        return wrapper
+
+
 class Cache:
     """A class for caching data in Redis."""
     def __init__(self):
@@ -22,16 +32,6 @@ class Cache:
         """
         self._redis = redis.Redis()
         self._redis.flushdb()
-
-    @staticmethod
-    def count_calls(method: Callable) -> Callable:
-        """Decorator to count the number of calls to a method."""
-        @wraps(method)
-        def wrapper(self, *args, **kwargs):
-            key = method.__qualname__
-            self._redis.incr(key)
-            return method(self, *args, **kwargs)
-        return wrapper
 
     @count_calls
     def store(self, data: Union[str, bytes, int, float]) -> str:
