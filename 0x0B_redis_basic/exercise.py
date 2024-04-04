@@ -45,14 +45,15 @@ def replay(fn: Callable) -> str:
         cache (Cache): The Cache instance.
         func (Callable): The function to replay the history for.
     """
-    func_name = func.__qualname__
-    inputs = cache._redis.lrange(f"{func_name}:inputs", 0, -1)
-    outputs = cache._redis.lrange(f"{func_name}:outputs", 0, -1)
-
-    value_key = cache._redis.get(func_name).decode('utf-8')
-    print(f"{func_name} was called {value_key} times:")
-    for input_args, output in zip(inputs, outputs):
-        print(f"{func_name}{input_args.decode()} -> {output.decode()}")
+    method = fn.__qualname__
+    inputs = f"{method}:inputs"
+    outputs = f"{method}:outputs"
+    input_list = fn.__self__._redis.lrange(inputs, 0, -1)
+    output_list = fn.__self__._redis.lrange(outputs, 0, -1)
+    value_key = fn.__self__._redis.get(method).decode('utf-8')
+    print(f"{method} was called {value_key} times:")
+    for inp, out in zip(input_list, output_list):
+        print(f"{method}(*{inp.decode('utf-8')}) -> {out.decode('utf-8')}")
 
 
 class Cache:
