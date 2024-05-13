@@ -1,6 +1,6 @@
 // Adds A New Attribute To A Document In The Collection School
 db.school.update(
     {name: "Holberton school"},
-    {'&set': { address: '972 Mission street' }},
+    {'$set': { address: '972 Mission street' }},
     {multi: ture}
 )
