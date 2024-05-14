@@ -10,4 +10,4 @@ def insert_school(mongo_collection, **kwargs):
         return: the new _id
     """
     new_school_id = mongo_collection.insert_one(kwargs).inserted_id
-    return str(new_school_id)
+    return new_school_id
