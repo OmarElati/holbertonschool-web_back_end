@@ -4,7 +4,7 @@
 
 def update_topics(mongo_collection, name, topics):
     """
-    Changes All Topics Of A School Document Based On The Name
+    Changes All Topics Of A School Document Based On The Name:
         param mongo_collection: pymongo collection object
         param name: school name to update
         param topics: list of topics approached in the school
