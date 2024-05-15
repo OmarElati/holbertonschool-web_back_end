@@ -10,7 +10,7 @@ if __name__ == "__main__":
     total_logs = logs_collection.count_documents({})
     print(f"{total_logs} logs")
 
-    methods = ["GET", "POST", "PUT", "Patch", "DELETE"]
+    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
     for method in methods:
         count = logs_collection.count_documents({"method": method})
         print(f"method {method}: {count}")
