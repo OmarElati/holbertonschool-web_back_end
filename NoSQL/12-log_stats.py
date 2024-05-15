@@ -15,5 +15,5 @@ if __name__ == "__main__":
         count = logs_collection.count_documents({"method": method})
         print(f"method {method}: {count}")
 
-    status_check = logs_collection.count_documents({"method": "GET", "path": "/status"})
+    status_check = logs_collection.count_documents({"path": "/status"})
     print (f"{status_check} status check")
