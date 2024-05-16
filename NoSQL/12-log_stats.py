@@ -3,13 +3,27 @@
 from pymongo import MongoClient
 
 
+def log_stats():
+    """ stats about Nginx logs stored in MongoDB """
+    client = MongoClient('mongodb://127.0.0.1:27017')
+    logs_collection = client.logs.nginx
+    total = logs_collection.count_documents({})
+    get = logs_collection.count_documents({"method": "GET"})
+    post = logs_collection.count_documents({"method": "POST"})
+    put = logs_collection.count_documents({"method": "PUT"})
+    patch = logs_collection.count_documents({"method": "PATCH"})
+    delete = logs_collection.count_documents({"method": "DELETE"})
+    path = logs_collection.count_documents(
+        {"method": "GET", "path": "/status"})
+    print(f"{total} logs")
+    print("Methods:")
+    print(f"\tmethod GET: {get}")
+    print(f"\tmethod POST: {post}")
+    print(f"\tmethod PUT: {put}")
+    print(f"\tmethod PATCH: {patch}")
+    print(f"\tmethod DELETE: {delete}")
+    print(f"{path} status check")
+
+
 if __name__ == "__main__":
-    client = MongoClient('mongodb://localhost:27017/').logs.nginx
-    print(f'{client.count_documents({})} logs')
-    print('Methods:')
-    print(f'\tmethod GET: {client.count_documents({"method": "GET"})}')
-    print(f'\tmethod POST: {client.count_documents({"method": "POST"})}')
-    print(f'\tmethod PUT: {client.count_documents({"method": "PUT"})}')
-    print(f'\tmethod PATCH: {client.count_documents({"method": "PATCH"})}')
-    print(f'\tmethod DELETE: {client.count_documents({"method": "DELETE"})}')
-    print(f'{client.count_documents({"path": "/status"})} status check')
+    log_stats()
