@@ -1,47 +1,51 @@
 const http = require('http');
-const fs = require('fs').promises;
+const fs = require('fs');
 
 async function countStudents(filepath) {
   try {
-    const csv = await fs.readFile(filepath, { encoding: 'utf8' });
-    const lines = csv.split(/\r?\n|\n/);
-    const headers = lines[0].split(',');
+    const csv = await fs.promises.readFile(filepath, { encoding: 'utf8' });
+    const headerArray = csv.split(/\r?\n|\n/);
+    const headers = headerArray[0].split(',');
 
-    const dictList = lines.slice(1)
-      .map(line => line.split(','))
-      .filter(data => data.length === headers.length)
-      .map(data => {
+    // strip headers and convert to list of dicts
+    const dictList = [];
+    const noHeaderArray = headerArray.slice(1);
+    for (let i = 0; i < noHeaderArray.length; i += 1) {
+      const data = noHeaderArray[i].split(',');
+      if (data.length === headers.length) {
         const row = {};
-        headers.forEach((header, index) => {
-          row[header.trim()] = data[index].trim();
-        });
-        return row;
-      });
+        for (let j = 0; j < headers.length; j += 1) {
+          row[headers[j].trim()] = data[j].trim();
+        }
+        dictList.push(row);
+      }
+    }
 
+    // count and collect first names of students per field
     let countCS = 0;
     let countSWE = 0;
     const studentsCS = [];
     const studentsSWE = [];
 
-    dictList.forEach(({ field, firstname }) => {
-      if (field === 'CS') {
+    dictList.forEach((element) => {
+      if (element.field === 'CS') {
         countCS += 1;
-        studentsCS.push(firstname);
-      } else if (field === 'SWE') {
+        studentsCS.push(element.firstname);
+      } else if (element.field === 'SWE') {
         countSWE += 1;
-        studentsSWE.push(firstname);
+        studentsSWE.push(element.firstname);
       }
     });
 
-    const totalStudents = countCS + countSWE;
+    const countStudents = countCS + countSWE;
 
-    return {
-      totalStudents,
+    return ({
+      countStudents,
       countCS,
       countSWE,
       studentsCS,
       studentsSWE,
-    };
+    });
   } catch (err) {
     throw new Error('Cannot load the database');
   }
@@ -51,39 +55,34 @@ const pathToDB = process.argv[2];
 const hostname = '127.0.0.1';
 const port = 1245;
 
-const app = http.createServer(async (req, res) => {
+const app = http.createServer((req, res) => {
   res.statusCode = 200;
   res.setHeader('Content-Type', 'text/plain');
-
   if (req.url === '/') {
     res.end('Hello Holberton School!');
   } else if (req.url === '/students') {
-    try {
-      const {
-        totalStudents,
+    // call async function and collect needed variables
+    countStudents(pathToDB)
+      .then(({
+        countStudents,
         countCS,
         countSWE,
         studentsCS,
         studentsSWE,
-      } = await countStudents(pathToDB);
-
-      res.write('This is the list of our students\n');
-      res.write(`Number of students: ${totalStudents}\n`);
-      res.write(`Number of students in CS: ${countCS}. List: ${studentsCS.join(', ')}\n`);
-      res.write(`Number of students in SWE: ${countSWE}. List: ${studentsSWE.join(', ')}`);
-      res.end();
-    } catch (error) {
-      res.statusCode = 500;
-      res.end('Error: Cannot load the database');
-    }
-  } else {
-    res.statusCode = 404;
-    res.end('Error: Not Found');
+      }) => {
+        res.write('This is the list of our students\n');
+        res.write(`Number of students: ${countStudents}\n`);
+        res.write(`Number of students in CS: ${countCS}. List: ${studentsCS.toString().split(',').join(', ')}\n`);
+        res.write(`Number of students in SWE: ${countSWE}. List: ${studentsSWE.toString().split(',').join(', ')}`);
+        res.end();
+      })
+      .catch(() => {
+        res.end('Error: Cannot load the database');
+        throw new Error('Cannot load the database');
+      });
   }
 });
 
-app.listen(port, hostname, () => {
-  console.log(`Server running at http://${hostname}:${port}/`);
-});
+app.listen(port, hostname);
 
 module.exports = app;
