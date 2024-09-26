@@ -1,34 +1,61 @@
 const http = require('http');
+const fs = require('fs');
+const path = require('path');
 
-const args = process.argv.slice(2);
-const countStudents = require('./3-read_file_async');
+const readStudentData = (databasePath) => {
+    const data = fs.readFileSync(databasePath, 'utf-8');
+    const lines = data.split('\n').filter(line => line.trim() !== '');
+    
+    let totalStudents = 0;
+    const csStudents = [];
+    const sweStudents = [];
 
-const DATABASE = args[0];
+    lines.forEach(line => {
+        const [name, track] = line.split(',');
+        if (track === 'CS') {
+            csStudents.push(name);
+        } else if (track === 'SWE') {
+            sweStudents.push(name);
+        }
+        totalStudents++;
+    });
 
-const hostname = '127.0.0.1';
-const port = 1245;
+    return {
+        totalStudents,
+        csStudents,
+        sweStudents
+    };
+};
 
-const app = http.createServer(async (req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
+const app = http.createServer((req, res) => {
+    const url = req.url;
 
-  const { url } = req;
+    if (url === '/') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Hello Holberton School!\n');
+    } else if (url === '/students') {
+        const databasePath = process.argv[2];
 
-  if (url === '/') {
-    res.write('Hello Holberton School!');
-  } else if (url === '/students') {
-    res.write('This is the list of our students\n');
-    try {
-      const students = await countStudents(DATABASE);
-      res.end(`${students.join('\n')}`);
-    } catch (error) {
-      res.end(error.message);
+        if (!databasePath) {
+            res.writeHead(400, { 'Content-Type': 'text/plain' });
+            res.end('Database file not provided\n');
+            return;
+        }
+
+        const { totalStudents, csStudents, sweStudents } = readStudentData(databasePath);
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end(`This is the list of our students\nNumber of students: ${totalStudents}\n` +
+                `Number of students in CS: ${csStudents.length}. List: ${csStudents.join(', ')}\n` +
+                `Number of students in SWE: ${sweStudents.length}. List: ${sweStudents.join(', ')}\n`);
+    } else {
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('Not Found\n');
     }
-  }
-  res.statusCode = 404;
-  res.end();
 });
 
-app.listen(port, hostname, () => { });
+const PORT = 1245;
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 module.exports = app;
